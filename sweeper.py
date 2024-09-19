@@ -9,6 +9,7 @@
 #example use: python3 sweeper.py 192.168.10.0 24 exclude
 
 import sys
+import subprocess
 #import socket (experimental)
 
 #binary to decimal
@@ -39,6 +40,14 @@ def ipSwitch():
 		itr += 1
 	return itr
 
+#ping
+def ping(ipVar):
+	try:
+		subprocess.check_output(["ping", "-c", "3", ipVar])
+		return True
+	except subprocess.CalledProcessError:
+		return False
+
 #socket for ping check (experimental)
 #def socketCheck(host,port,timeout=2):
 	#sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM) 
@@ -53,17 +62,13 @@ def ipSwitch():
 	
 
 #read exclude file
-argList = [sys.argv[3]]
+argList = sys.argv[3]
 try:
-    with open(argList[0], 'r') as fp:
+    with open(argList, 'r') as fp:
         file = fp.read().replace('\n', ' ')
 except FileNotFoundError:
     print('File not found')
     exit()
-
-
-
-
 
 ip, CIDR = sys.argv[1], sys.argv[2]
 submask = ''
@@ -132,12 +137,21 @@ elif tempITR == 2:
 			print(tmpFinalIP)
 			j += 1
 		i += 1
-#very likely since it is /16
+#very likely since it is /24
 elif tempITR == 3:
 	for i in range(fourthDecimal, 256):
 		tmpFinalIP = finalIP + str(i)
-		print(tmpFinalIP)
+		if tmpFinalIP in file:
+			pass
+		else:
+			if ping(finalIP):
+				print('wurk')
+			else:
+				print('gg')
 		i += 1
 #bro just nmap it
 elif tempITR == 4:
-	print(finalIP)
+	if ping(finalIP):
+		print('work?')
+	else:
+		print('gg')
