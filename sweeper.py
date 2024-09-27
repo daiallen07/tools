@@ -42,24 +42,13 @@ def ipSwitch():
 
 #ping
 def ping(ipVar):
-	try:
-		subprocess.check_output(["ping", "-c", "3", ipVar])
-		return True
-	except subprocess.CalledProcessError:
-		return False
-
-#socket for ping check (experimental)
-#def socketCheck(host,port,timeout=2):
-	#sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM) 
-	#sock.settimeout(timeout)
-	#try:
-		#sock.connect((host,port))
-	#except:
-		#return False
-	#else:
-		#sock.close()
-		#return True
-	
+	cmd = "ping -c 1 " + ipVar + " | grep " + '"bytes from"'
+	# this is creating a new process (forking not subthreading)
+    # You should calculate how many ips will be pings and make a list of x amount that they will be split up into
+    # then make x amount of threads and pass the list to each thread
+    # looking inot that
+    #if you put this on github i might help later im tired af atm
+    #subprocess.Popen(cmd,shell=True)
 
 #read exclude file
 argList = sys.argv[3]
@@ -134,7 +123,10 @@ elif tempITR == 2:
 	for i in range(thirdDecimal, 256):
 		for j in range(fourthDecimal, 256):
 			tmpFinalIP = finalIP + str(i) + '.' + str(j)
-			print(tmpFinalIP)
+			if tmpFinalIP in file:
+				pass
+			else:
+				ping(tmpFinalIP)
 			j += 1
 		i += 1
 #very likely since it is /24
