@@ -10,7 +10,7 @@
 
 import sys
 import subprocess
-import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 #binary to decimal
 def bintodec(octet):
@@ -43,10 +43,7 @@ def ipSwitch():
 #ping
 def ping(ipVar):
 	try:
-		result = subprocess.run(['ping', '-c', '1', ipVar], text=True, capture_output=True)
-
-		if "bytes from" in result.stdout:
-			print(result.stdout.strip())
+		subprocess.run(['ping', '-c', '1', ipVar], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 	except Exception as e:
 		print(f"Error pinging {ip}: {e}")
 
@@ -62,7 +59,7 @@ except FileNotFoundError:
 
 ip, CIDR = sys.argv[1], sys.argv[2]
 submask = ''
-ipList = []
+threads = []
 #convert the /xx into binary form
 i = 0
 while i < 32:
@@ -121,31 +118,38 @@ elif tempITR == 1:
 		i += 1
 #good chance it will be used for /16
 elif tempITR == 2:
-	for i in range(thirdDecimal, 255):
-		for j in range(fourthDecimal, 255):
-			tmpFinalIP = finalIP + str(i) + '.' + str(j)
+	max_workers=100
+	with ThreadPoolExecutor(max_workers=max_workers) as executor:
+		futures = []
+		for i in range(thirdDecimal, 255):
+			for j in range(fourthDecimal, 255):
+				tmpFinalIP = finalIP + str(i) + '.' + str(j)
+				if tmpFinalIP in file:
+					pass
+				else:
+					futures.append(executor.submit(ping, tmpFinalIP))
+					for future in as_completed(futures):
+						output = future.result()
+						if output:
+							print(output)
+				j += 1
+			i += 1
+#very likely since it is /24
+elif tempITR == 3:
+	max_workers=100
+	with ThreadPoolExecutor(max_workers=max_workers) as executor:
+		futures = []
+		for i in range(fourthDecimal, 255):
+			tmpFinalIP = finalIP + str(i)
 			if tmpFinalIP in file:
 				pass
 			else:
-				thread = threading.Thread(target=ping, args=(tmpFinalIP,))
-				threads.append(thread)
-				thread.start()
-				for thread in threads:
-					thread.join()
-			j += 1
-		i += 1
-#very likely since it is /24
-elif tempITR == 3:
-	for i in range(fourthDecimal, 255):
-		tmpFinalIP = finalIP + str(i)
-		if tmpFinalIP in file:
-			pass
-		else:
-			if ping(finalIP):
-				print('wurk')
-			else:
-				print('gg')
-		i += 1
+				futures.append(executor.submit(ping, tmpFinalIP))
+				for future in as_completed(futures):
+					output = future.result()
+					if output:
+						print(output)
+			i += 1
 #bro just nmap it
 elif tempITR == 4:
 	if ping(finalIP):
