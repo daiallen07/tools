@@ -10,7 +10,7 @@
 
 import sys
 import subprocess
-#import socket (experimental)
+import threading
 
 #binary to decimal
 def bintodec(octet):
@@ -42,13 +42,14 @@ def ipSwitch():
 
 #ping
 def ping(ipVar):
-	cmd = "ping -c 1 " + ipVar + " | grep " + '"bytes from"'
-	# this is creating a new process (forking not subthreading)
-    # You should calculate how many ips will be pings and make a list of x amount that they will be split up into
-    # then make x amount of threads and pass the list to each thread
-    # looking inot that
-    #if you put this on github i might help later im tired af atm
-    #subprocess.Popen(cmd,shell=True)
+	try:
+		result = subprocess.run(['ping', '-c', '1', ipVar], text=True, capture_output=True)
+
+		if "bytes from" in result.stdout:
+			print(result.stdout.strip())
+	except Exception as e:
+		print(f"Error pinging {ip}: {e}")
+
 
 #read exclude file
 argList = sys.argv[3]
@@ -61,7 +62,7 @@ except FileNotFoundError:
 
 ip, CIDR = sys.argv[1], sys.argv[2]
 submask = ''
-
+ipList = []
 #convert the /xx into binary form
 i = 0
 while i < 32:
@@ -98,10 +99,10 @@ if i < 4:
 #ping sweep (could probs be condensed)
 #0 will not be used (no one uses /0 but here just in case lmao)
 if tempITR == 0:
-	for i in range(firstDecimal, 256):
-		for j in range(secondDecimal, 256):
-			for k in range(thirdDecimal, 256):
-				for l in range(fourthDecimal, 256):
+	for i in range(firstDecimal, 255):
+		for j in range(secondDecimal, 255):
+			for k in range(thirdDecimal, 255):
+				for l in range(fourthDecimal, 255):
 					tmpFinalIP = finalIP + str(i) + '.' + str(j) + '.' + str(k) + '.' + str(l)
 					print(tmpFinalIP)
 					l += 1
@@ -110,9 +111,9 @@ if tempITR == 0:
 		i += 1
 #1 will most likely not be used in competition since it is too big
 elif tempITR == 1:
-	for i in range(secondDecimal, 256):
-		for j in range(thirdDecimal, 256):
-			for k in range(fourthDecimal, 256):
+	for i in range(secondDecimal, 255):
+		for j in range(thirdDecimal, 255):
+			for k in range(fourthDecimal, 255):
 				tmpFinalIP = finalIP + str(i) + '.' + str(j) + '.' + str(k)
 				print(tmpFinalIP)
 				k += 1
@@ -120,18 +121,22 @@ elif tempITR == 1:
 		i += 1
 #good chance it will be used for /16
 elif tempITR == 2:
-	for i in range(thirdDecimal, 256):
-		for j in range(fourthDecimal, 256):
+	for i in range(thirdDecimal, 255):
+		for j in range(fourthDecimal, 255):
 			tmpFinalIP = finalIP + str(i) + '.' + str(j)
 			if tmpFinalIP in file:
 				pass
 			else:
-				ping(tmpFinalIP)
+				thread = threading.Thread(target=ping, args=(tmpFinalIP,))
+				threads.append(thread)
+				thread.start()
+			for thread in threads:
+				thread.join()
 			j += 1
 		i += 1
 #very likely since it is /24
 elif tempITR == 3:
-	for i in range(fourthDecimal, 256):
+	for i in range(fourthDecimal, 255):
 		tmpFinalIP = finalIP + str(i)
 		if tmpFinalIP in file:
 			pass
