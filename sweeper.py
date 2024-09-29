@@ -130,8 +130,8 @@ elif tempITR == 2:
 				thread = threading.Thread(target=ping, args=(tmpFinalIP,))
 				threads.append(thread)
 				thread.start()
-			for thread in threads:
-				thread.join()
+				for thread in threads:
+					thread.join()
 			j += 1
 		i += 1
 #very likely since it is /24
