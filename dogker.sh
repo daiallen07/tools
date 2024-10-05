@@ -1,8 +1,8 @@
 #dogker install script
-sudo apt install docker.io -y
-sudo apt install docker-compose -y
-docker pull docker.io/kalilinux/kali-rolling
-docker run --tty --interactive kalilinux/kali-rolling
+sudo apt-get install docker.io -y
+sudo apt-get install docker-compose -y
+sudo docker pull docker.io/kalilinux/kali-rolling
+sudo docker run --tty --interactive kalilinux/kali-rolling
 
 
 #after you get into the docker terminal, run apt update
