@@ -1,5 +1,1 @@
-for i in {0..255}; do
-    for j in {0..255}; do
-        ping -c 1 192.168.$i.$j | grep "bytes from" | awk -F' ' '{print $4}' | tr -d ':' >> ip.txt
-    done
-done
+fping -a -g ip/subnet > ip.txt
