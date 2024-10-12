@@ -1,2 +1,3 @@
 sudo fping -q -a -s -g ip/subnet
 nmap -sC -sV -iL <.txt> -min-rate 2000 (or 1000) -oA firstscan
+xsltproc scan.xml > scan.html
