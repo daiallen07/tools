@@ -6,5 +6,5 @@ nmap -sn -T3 --min-parallelism 100 subnet/mask -oG output.file.txt; grep -v Down
 
 nmap -sn <ip/subnet> #no port scan
 nmap -PE -sn <ip/subnet> #icmp scan
-nmap -sC -sV -iL <.txt> -T3 -oA firstscan
+nmap -sC -sV -iL <.txt> -p- -Pn -oA firstscan
 xsltproc scan.xml > scan.html
