@@ -3,6 +3,7 @@ nmap -sn --min-parallelism 100 subnet/mask -oG output.file.txt; grep -v Down out
 xsltproc scan.xml > scan.html
 nmap -sC -sV -iL <.txt> -p- -Pn -oA firstscan
 
+#chisel and proxychains scan
 
 
 
