@@ -1,4 +1,5 @@
 #test: source - https://serverfault.com/questions/665311/fastest-way-to-scan-all-hosts-that-are-online
+#take out --min-parallelism since it just speeds stuff up
 nmap -sn --min-parallelism 100 subnet/mask -oG output.file.txt; grep -v Down output.file.txt
 nmap -sC -sV -iL <.txt> -p- -Pn -oA firstscan #outputs network scan in .gnmap, .nmap, .xml
 xsltproc scan.xml > scan.html #convert make xml to html
