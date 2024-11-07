@@ -7,7 +7,7 @@ echo "Ping sweep complete"
 
 #use ip from previous output and conduct basic nmap scan with xml and nmap format output
 #no threads or min-rate, will be slow but at least we won't crash the network, right?
-nmap -sC -sV -iL foundIp_filtered.txt -p- -Pn -oN nmap_output -oX xml_ouput
+nmap -sC -sV -iL foundIp_filtered.txt -Pn -oN nmap_output -oX xml_ouput
 echo "Nmap complete"
 
 #convert xml into HTML
